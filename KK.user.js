@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name              网盘快开助手
 // @namespace         https://github.com/maimierjiafude/KK_OpenPanHelper
-// @version           1.0.0
+// @version           1.0.1
 // @author            龙龙龙
 // @description       划一划，快速打开文本中的网盘链接，自动提取提取码和解压密码，同时为了防止忘记链接相关信息，还会整合提取码和解压密码，在浏览器的历史记录里面打开，就会跳出提醒框。以及有分享的KK链接，要说的都在链接里面，插件全帮你搞定（对方也要装网盘快开插件才行）。还有前后台打开模式，快开和弹窗模式，都在设置里面。沉浸式上网冲浪！
 // @license           AGPL-3.0-or-later
@@ -690,10 +690,9 @@
                     }
                     input.dispatchEvent(event);
 
-                    if (util.getValue('setting_auto_click_btn')) {
-                        await util.sleep(1000); //1秒后点击按钮
-                        button.click();
-                    }
+                    await util.sleep(200); //0.2秒后点击按钮
+                    button.click();
+
                 } else {
                     maxTime === 0 && clearInterval(ins);
                 }
