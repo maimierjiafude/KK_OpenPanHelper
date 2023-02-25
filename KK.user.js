@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name              网盘快开助手
 // @namespace         https://github.com/maimierjiafude/KK_OpenPanHelper
-// @version           1.0.1
+// @version           1.1.0
 // @author            龙龙龙
-// @description       划一划，快速打开文本中的网盘链接，自动提取提取码和解压密码，同时为了防止忘记链接相关信息，还会整合提取码和解压密码，在浏览器的历史记录里面打开，就会跳出提醒框。以及有分享的KK链接，要说的都在链接里面，插件全帮你搞定（对方也要装网盘快开插件才行）。还有前后台打开模式，快开和弹窗模式，都在设置里面。沉浸式上网冲浪！
+// @description       划一划，快速打开文本中的网盘链接，支持20+网盘，能自动提取提取码和解压密码。同时为了防止忘记链接相关信息，还会整合提取码和解压密码在链接里面，更有解压密码提示助手，在浏览器的历史记录里面打开，就会跳出提醒框，一键复制解压密码！！！。以及有分享的KK链接，要说的都在链接里面，插件全帮你搞定，直接网址打开无需多言（对方也要装网盘快开插件才行）。还有前后台打开模式，快开和弹窗模式，设置最适合自己的。沉浸式上网冲浪！
 // @license           AGPL-3.0-or-later
 // @supportURL        https://github.com/maimierjiafude/KK_OpenPanHelper
 // @match             *://*/*
@@ -15,18 +15,22 @@
 // @grant             GM_getValue
 // @grant             GM_registerMenuCommand
 // @grant             GM_getResourceText
+// @grant             GM_setClipboard
 // @grant             GM_info
 // @icon              data:image/svg+xml;base64,PHN2ZyB0PSIxNjczOTcwMjM5NTk1IiBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjE0MTMiIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIj48cGF0aCBkPSJNNDcwLjIyOTMzMyA0NDkuMTA5MzMzbDY0IDAuMTA2NjY3TDUzMy4zMzMzMzMgOTQ5LjM5NzMzM2wtNjQtMC4xMjggMC44OTYtNTAwLjE2eiBtMzIuMjEzMzM0LTM4OC4yNjY2NjZsMTkwLjE4NjY2NiAxOTUuMDA4djE1Ni40OGwxOTUuNTYyNjY3IDE5NS41NjI2NjZWNzQ4LjhoLTE5NS45NDY2Njd2OTAuOTg2NjY3aC02NHYtMTE4Ljc0MTMzNGgwLjM4NFYyODEuODc3MzMzbC0xMjYuMTg2NjY2LTEyOS4zODY2NjYtMTI2LjE2NTMzNCAxMjkuMzY1MzMzIDAuOTE3MzM0IDQ2Ni4xMzMzMzNoLTAuMjk4NjY3djkxLjc5NzMzNGgtNjR2LTkxLjc5NzMzNEgxMTcuMzMzMzMzdi0xNDAuMDk2bDE5NS4yLTE5NS4yMjEzMzMtMC4yOTg2NjYtMTU2LjggMTkwLjIwOC0xOTUuMDI5MzMzeiBtMTkwLjE4NjY2NiA0NDIuMDA1MzMzVjY4NC44aDEzMS41NjI2Njd2LTUwLjM4OTMzM2wtMTMxLjU2MjY2Ny0xMzEuNTYyNjY3eiBtLTM3OS45MjUzMzMgMC4xNzA2NjdMMTgxLjMzMzMzMyA2MzQuMzg5MzMzdjQ5LjZoMTMxLjczMzMzNGwtMC4zNjI2NjctMTgwLjk3MDY2NnoiIGZpbGw9IiMxNjc3RkYiIHAtaWQ9IjE0MTQiPjwvcGF0aD48L3N2Zz4=
 // ==/UserScript==
-
 
 (function () {
     'use strict';
 
     // 在addPluginStyle里面配置style
+    // 对于一些部件自定义调节css样式，可以防止和其他插件撞样式
     const customClass = {
-        container: 'panai-container',
-        popup: 'panai-popup',
+        container: 'KK-panai-container',
+        popup: 'KK-panai-popup',
+        htmlContainer: 'KK-panai-htmlContainer',
+        title: 'KK-panai-title',
+        actions: 'KK-panai-actions',
     };
 
     // 工具汇总
@@ -111,14 +115,14 @@
                 toast: true,
                 showCancelButton: true,
                 position: 'top',
-                title: `<span style="color: #2778c4;margin: 0 5px;">网盘快开助手</span>`,
+                title: `<span style="color: #2778c4;margin: 0 5px;">网盘快开助手(此窗口可设置不显示)</span>`,
                 html: `<span style="font-size: 0.8em;display:block">  ${formatText.replace(/\n/g, '<br>')}  </span>`,
                 confirmButtonText: '复制KK链接',
                 cancelButtonText: '关闭',
                 customClass
             }).then((res) => {
                 if (res.isConfirmed || res.dismiss === 'timer') {
-                    GM_setClipboard(this.kkLink(pan_obj));
+                    GM_setClipboard(main.kkLink(pan_obj));
                 };
             });
         },
@@ -147,17 +151,16 @@
             Swal.fire({
                 toast: true,
                 showCancelButton: true,
-                showDenyButton: true,
-                showConfirmButton:false,
-                denyButtonText: '复制KK链接',
+                showConfirmButton:true,
+                confirmButtonText: '复制KK链接',
                 cancelButtonText: '关闭',
                 position: 'top-start',
                 padding:'1px',
                 width:'300px',
-                title:`<span style="color: #2778c4;margin: 0px;font-weight:bold">解压密码：${zip}</span><button id="KK_zipButton" style="width:48px;height:27px;cursor: pointer;border:none;border-radius: 2px;background: #1875ff; text-align: center;color: white;positon:curser">复 制</button>`,
+                title:`<span style="color: #2778c4;margin: 0px;font-weight:bold">解压密码：${zip} </span><button id="KK_zipButton" style="width:60px;height:25px;cursor: pointer;border:none;border-radius: 2px;background: red; text-align: center;color: white;positon:curser">复 制</button>`,
                 customClass
             }).then((res) => {
-                if (res.isDenied){
+                if (res.isConfirmed){
                     GM_setClipboard(url);
                 }
             })
@@ -366,10 +369,10 @@
             };
 
             // 获取提取码
-            pan_obj.pwd = '' || this.parsePwd(text);
+            pan_obj.pwd = this.parsePwd(text);
 
             // 获取解压码
-            pan_obj.zip = '' || this.parseZipPasswords(text);
+            pan_obj.zip = this.parseZipPasswords(text);
 
             // 文字替换
             text = this.textFliter(text);
@@ -388,13 +391,16 @@
         //正则解析超链接类型网盘链接
         // ⚠️可能会增加时间⚠️ 如果有需要可以增加选项
         // 获取选择内容的HTML和文本(增加兼容性) 或 DOM（节点遍历）
-        // 使用chatGPT生成的，英语不好，在Stack Overflow上不会搜
+        // 使用chatGPT生成并修改
         parseALink(selection) {           
             if (!selection.isCollapsed) {
                 const range = selection.getRangeAt(0);
                 const commonAncestor = range.commonAncestorContainer;
-                const links = commonAncestor.querySelector('*[href]')
-                return this.parseLink(links ? links.href : "");
+                if (typeof(commonAncestor.querySelector) !== 'undefined') {
+                    const links = commonAncestor.querySelector('*[href]')
+                    return this.parseLink(links ? links.href : "");
+                }
+
             }
             return ;
         },
@@ -414,6 +420,7 @@
         },
 
         //正则解析提取码
+        // 这里的?<=正向后发断言 看文档说JS不支持，但是目前呢能用，以后改吧
         parsePwd(text) {
             text = text.replace(/\u200B/g, '');
             let reg = /(?<=\s*(?:密|提取|访问|訪問|key|password|pwd|#)\s*[码碼]?\s*[：:=]?\s*)[a-zA-Z0-9]{3,8}\w/i;
@@ -426,11 +433,18 @@
 
         //正则解析解压密码
         parseZipPasswords(text) {
-            let zip_reg = /(?<=\s*(?:解压|解压密)\s*[码碼]\s*[：:=]\s*)(.+?)\s/;
+            let zip_reg = /(?<=\s*(?:解压|解压密)\s*[码碼]\s*)[：:=]?\s*(.+?)\s/;
             if (zip_reg.test(text)) {
                 let match = text.match(zip_reg);
                 return match[1];
             }
+
+            let zip_hash_reg = /#zip(.+)zip/;
+            if (zip_hash_reg.test(text)){
+                let match = text.match(zip_hash_reg);
+                return match[1];
+            }
+
             return '';
         },
         // 正则解析链接
@@ -453,7 +467,7 @@
         },
 
         // 优化筛选输入的string，没有四个以上字母的通通抬走呢
-        parseTextAndReturn(data) {
+        parsePreTextAndReturn(data) {
 
             let text_reg = /[A-z]{4,}/g;
 
@@ -479,22 +493,45 @@
             return null;
         },
 
+        // 专门为百度准备的解析，因为要本地存储比对
+        parseBaidLink(url) {
+            let baidu_reg = /(?:https?:\/\/)?(?:e?yun|pan)\.baidu\.com\/(?:s\/|share\/init\?surl=)(.+?)(?:\?|&)/;
+            if (baidu_reg.test(url)){
+                let match = url.match(baidu_reg);
+                return match[1];
+            }
+            return;
+        }
+
     };
 
     // 主要代码逻辑
     let main = {
 
         // 初始化配置数据
-        // 打开方式，本地链接存储列表，运行模式，本地存储最大长度
+        // KK_setting_open_model false 快开模式;true 弹窗模式
+        // KK_setting_active true 后台打开,false 新窗口打开
+        // KK_setting_show_copyPN 是否显示快开模式的弹窗 yes 是
+        // KK_local_data 需要本地保存的用于缓冲数据
         initValue() {
             let value = [{
+                name: 'KK_setting_open_model',
+                value: true
+            }, {
                 name: 'KK_setting_active',
                 value: true
             }, {
-                name: 'KK_setting_open_model',
-                value: false
+                name: 'KK_setting_show_copyPN',
+                value: true
+            }, {
+                name: 'KK_local_data',
+                value: {
+                    'url': '',
+                    'code': '', 
+                    'zip': ''
+                }
             }];
-
+            
             value.forEach((v) => {
                 if (util.getValue(v.name) === undefined) {
                     util.setValue(v.name, v.value);
@@ -567,10 +604,9 @@
         root(event, data = '') {
             let pan_obj = {};
 
-            if (!parse.parseTextAndReturn(data)) {
+            if (!parse.parsePreTextAndReturn(data)) {
                 return;
             }
-
 
             // 粘贴事件
             if (event == 'paste') {
@@ -582,21 +618,24 @@
                 pan_obj = parse.parseSelection(data);
             };
 
+            // 熔断机制
             if (!pan_obj.link) {
                 return
             };
 
             util.clog('获取到链接了!')
-
-            window.getSelection().empty();
             parse.lastText = 'long';
+            (event == 'selection' ) ? window.getSelection().empty():'';
 
             let KK_setting_open_model = util.getValue('KK_setting_open_model');
+            let KK_setting_show_copyPN = util.getValue('KK_setting_show_copyPN');
 
             if (KK_setting_open_model) {
                 let url = this.kkLink(pan_obj);
-                popupNotifications.copyPN(pan_obj)
                 this.openHTML(url)
+                if (KK_setting_show_copyPN) { 
+                    popupNotifications.copyPN(pan_obj)
+                };
             } else {
                 popupNotifications.openPN(pan_obj)
             };
@@ -606,11 +645,11 @@
         // 快捷键操作，Enter确定，Esc退出
         pressKey(event) {
             if (event.key === 'Enter') {
-                let confirmBtn = document.querySelector('.panai-container .swal2-confirm');
+                let confirmBtn = document.querySelector('.KK-panai-container .swal2-confirm');
                 confirmBtn && confirmBtn.click();
             }
             if (event.key === 'Escape') {
-                let cancelBtn = document.querySelector('.panai-container .swal2-cancel');
+                let cancelBtn = document.querySelector('.KK-panai-container .swal2-cancel');
                 cancelBtn && cancelBtn.click();
             }
         },
@@ -627,6 +666,27 @@
             return
         },
 
+        // 本地存储百度的特征码和解压密码
+        saveBaiduData(baidu_save_code, zip){
+            if(baidu_save_code && zip){
+                util.setValue('KK_local_data', {
+                    'code':baidu_save_code, 
+                    'zip':zip
+                });
+            }
+        },
+
+        // 监听url的hash变化,并且进行当前url的替换，在hash值里面加入解压密码
+        watchUrlHashChange(zip){
+            if( ("onhashchange" in window) && ((typeof document.documentMode==="undefined") || document.documentMode==8)) {
+                window.onhashchange = () => {
+                    if (location.hash.toString().indexOf("#zip") == -1) {
+                        location.hash = '#zip' + zip + 'zip'+ location.hash
+                    };
+                };
+            }
+        },
+
         //自动填写密码
         autoFillPassword() {
             let panType = this.panDetectReturnName();
@@ -638,9 +698,10 @@
             let pwd_query = parse.parseQuery('pwd');
             let pwd_hash = location.hash.slice(1);
             
+            let baidu_save_code = parse.parseBaidLink(url)
 
-            let zip_hash_reg = /#zip(.+)zip/;
             let zip = '';
+            let zip_hash_reg = /#zip(.+)zip/;
             if (zip_hash_reg.test(pwd_hash)){
                 zip = pwd_hash.match(zip_hash_reg)[1];
                 zip = decodeURI(zip);
@@ -656,6 +717,7 @@
                         pwd = util.getValue(val.storagePwdName) ? util.getValue(val.storagePwdName) : '';
                         pwd && this.doFillAction(val.input, val.button, pwd);
                     }
+
                     if (val.storage === 'hash') {
                         if (!/^[a-zA-Z0-9]{3,8}$/.test(pwd)) { //过滤掉不正常的Hash
                             return;
@@ -664,7 +726,20 @@
                     }
                 }
             }
-            zip && popupNotifications.zipPN(url,zip)
+            this.saveBaiduData(baidu_save_code, zip)
+            let baidu_data = util.getValue('KK_local_data');
+            if (url.indexOf(baidu_data.code) && !zip){
+                zip = baidu_data.zip;
+                location.hash = '#zip' + zip + 'zip'+ location.hash
+                url = location.href;
+            };
+
+            if (zip && baidu_save_code){
+                this.watchUrlHashChange(zip);  
+            };
+
+            zip && popupNotifications.zipPN(url,zip);
+
         },
 
         // 进行填写
@@ -703,14 +778,17 @@
         // 显示设置
         showSettingBox() {
             let html = `<div style="font-size: 1em;">
-                            <label class="panai-setting-label">插件运行模式
-                                <select id="QK-Model" class="panai-setting-select">
+                            <label class="KK-panai-setting-label">插件运行模式
+                                <select id="KK-Model" class="KK-panai-setting-select">
                                     <option>快开模式</option>
                                     <option>弹窗模式</option>
                                 </select>
                             </label>
-                            <label class="panai-setting-label">新窗口打开方式
-                                <select id="QK-Active" class="panai-setting-select">
+                            <label class="KK-panai-setting-label" id="KK-checkbox-show-copyPN" style="${util.getValue('KK_setting_open_model') ? 'display: flex' : 'display: none'}">快开模式显示复制弹窗
+                                <input type="checkbox" class="KK-panai-setting-checkbox" ${util.getValue('KK_setting_show_copyPN') ? 'checked' : ''} >
+                            </label>
+                            <label class="KK-panai-setting-label">新窗口打开方式
+                                <select id="KK-Active" class="KK-panai-setting-select">
                                     <option>新窗口打开</option>
                                     <option>后台打开</option>
                                 </select>
@@ -730,14 +808,20 @@
                 res.isConfirmed && location.reload();
             });
 
-            document.getElementById('QK-Model').selectedIndex = (util.getValue('KK_setting_open_model') ? 0 : 1);
-            document.getElementById('QK-Model').addEventListener('change', () => {
+            document.getElementById('KK-Model').selectedIndex = (util.getValue('KK_setting_open_model') ? 0 : 1);
+            document.getElementById('KK-Model').addEventListener('change', () => {
+                let KK_checkbox_show_copyPN = document.getElementById('KK-checkbox-show-copyPN');
+                KK_checkbox_show_copyPN.style.display = (!util.getValue('KK_setting_open_model')? 'flex' : 'none')
                 util.setValue('KK_setting_open_model', !util.getValue('KK_setting_open_model'));
             });
 
-            document.getElementById('QK-Active').selectedIndex = (util.getValue('KK_setting_active') ? 0 : 1);
-            document.getElementById('QK-Active').addEventListener('change', () => {
+            document.getElementById('KK-Active').selectedIndex = (util.getValue('KK_setting_active') ? 0 : 1);
+            document.getElementById('KK-Active').addEventListener('change', () => {
                 util.setValue('KK_setting_active', !util.getValue('KK_setting_active'));
+            });
+
+            document.getElementById("KK-checkbox-show-copyPN").addEventListener('change', () => {
+                util.setValue('KK_setting_show_copyPN', !util.getValue('KK_setting_show_copyPN'));
             });
         },
 
@@ -759,20 +843,24 @@
         // 样式总控制
         addPluginStyle() {
             let style = `
-                .panai-container { z-index: 99999!important }
-                .panai-popup { font-size: 14px !important }
-                .panai-setting-label { display: flex;align-items: center;justify-content: space-between;padding-top: 20px; }
-                .panai-setting-select { width: 150px;height: 30px;font-size: 1em; }
+                .KK-panai-title {text-align: center !important; }
+                .KK-panai-container { z-index: 99999!important; text-align: center !important; }
+                .KK-panai-popup { font-size: 14px !important; text-align: center !important; }
+                .KK-panai-htmlContainer{ margin: 2px !important; padding:1px !important;}
+                .KK-panai-actions {justify-content: center!important; align-items: center;}
+                .KK-panai-setting-label { display: flex;align-items: center;justify-content: space-between;padding-top: 20px; }
+                .KK-panai-setting-select { width: 150px;height: 30px;font-size: 1em; }
+                .KK-panai-setting-checkbox { width: 16px;height: 16px; }
             `;
 
             if (document.head) {
-                util.addStyle('swal-pub-style', 'style', GM_getResourceText('swalStyle'));
-                util.addStyle('panai-style', 'style', style);
+                util.addStyle('KK-swal-style', 'style', GM_getResourceText('swalStyle'));
+                util.addStyle('KK-panai-style', 'style', style);
             }
 
             const headObserver = new MutationObserver(() => {
-                util.addStyle('swal-pub-style', 'style', GM_getResourceText('swalStyle'));
-                util.addStyle('panai-style', 'style', style);
+                util.addStyle('KK-swal-style', 'style', GM_getResourceText('swalStyle'));
+                util.addStyle('KK-panai-style', 'style', style);
             });
             headObserver.observe(document.head, { childList: true, subtree: true });
         },
