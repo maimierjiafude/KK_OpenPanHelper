@@ -20,6 +20,9 @@
 // @icon              data:image/svg+xml;base64,PHN2ZyB0PSIxNjczOTcwMjM5NTk1IiBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjE0MTMiIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIj48cGF0aCBkPSJNNDcwLjIyOTMzMyA0NDkuMTA5MzMzbDY0IDAuMTA2NjY3TDUzMy4zMzMzMzMgOTQ5LjM5NzMzM2wtNjQtMC4xMjggMC44OTYtNTAwLjE2eiBtMzIuMjEzMzM0LTM4OC4yNjY2NjZsMTkwLjE4NjY2NiAxOTUuMDA4djE1Ni40OGwxOTUuNTYyNjY3IDE5NS41NjI2NjZWNzQ4LjhoLTE5NS45NDY2Njd2OTAuOTg2NjY3aC02NHYtMTE4Ljc0MTMzNGgwLjM4NFYyODEuODc3MzMzbC0xMjYuMTg2NjY2LTEyOS4zODY2NjYtMTI2LjE2NTMzNCAxMjkuMzY1MzMzIDAuOTE3MzM0IDQ2Ni4xMzMzMzNoLTAuMjk4NjY3djkxLjc5NzMzNGgtNjR2LTkxLjc5NzMzNEgxMTcuMzMzMzMzdi0xNDAuMDk2bDE5NS4yLTE5NS4yMjEzMzMtMC4yOTg2NjYtMTU2LjggMTkwLjIwOC0xOTUuMDI5MzMzeiBtMTkwLjE4NjY2NiA0NDIuMDA1MzMzVjY4NC44aDEzMS41NjI2Njd2LTUwLjM4OTMzM2wtMTMxLjU2MjY2Ny0xMzEuNTYyNjY3eiBtLTM3OS45MjUzMzMgMC4xNzA2NjdMMTgxLjMzMzMzMyA2MzQuMzg5MzMzdjQ5LjZoMTMxLjczMzMzNGwtMC4zNjI2NjctMTgwLjk3MDY2NnoiIGZpbGw9IiMxNjc3RkYiIHAtaWQ9IjE0MTQiPjwvcGF0aD48L3N2Zz4=
 // ==/UserScript==
 
+
+
+
 (function () {
     'use strict';
 
@@ -728,7 +731,7 @@
             }
             this.saveBaiduData(baidu_save_code, zip)
             let baidu_data = util.getValue('KK_local_data');
-            if (url.indexOf(baidu_data.code) && !zip){
+            if ((url.indexOf(baidu_data.code) != -1 ) && !zip){
                 zip = baidu_data.zip;
                 location.hash = '#zip' + zip + 'zip'+ location.hash
                 url = location.href;
