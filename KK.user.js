@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name              网盘快开助手
 // @namespace         https://github.com/maimierjiafude/KK_OpenPanHelper
-// @version           1.1.0
+// @version           1.1.2
 // @author            龙龙龙
 // @description       划一划，快速打开文本中的网盘链接，支持20+网盘，能自动提取提取码和解压密码。同时为了防止忘记链接相关信息，还会整合提取码和解压密码在链接里面，更有解压密码提示助手，在浏览器的历史记录里面打开，就会跳出提醒框，一键复制解压密码！！！。以及有分享的KK链接，要说的都在链接里面，插件全帮你搞定，直接网址打开无需多言（对方也要装网盘快开插件才行）。还有前后台打开模式，快开和弹窗模式，设置最适合自己的。沉浸式上网冲浪！
 // @license           AGPL-3.0-or-later
@@ -533,6 +533,9 @@
                     'code': '', 
                     'zip': ''
                 }
+            }, {
+                name: 'KK_setting_auto_copy',
+                value: true
             }];
             
             value.forEach((v) => {
@@ -627,14 +630,20 @@
             };
 
             util.clog('获取到链接了!')
+            util.clog(pan_obj)
             parse.lastText = 'long';
             (event == 'selection' ) ? window.getSelection().empty():'';
 
             let KK_setting_open_model = util.getValue('KK_setting_open_model');
             let KK_setting_show_copyPN = util.getValue('KK_setting_show_copyPN');
+            let KK_setting_auto_copy = util.getValue('KK_setting_auto_copy');
+            let url = this.kkLink(pan_obj);
+
+            if (KK_setting_auto_copy){
+                GM_setClipboard(url);
+            };
 
             if (KK_setting_open_model) {
-                let url = this.kkLink(pan_obj);
                 this.openHTML(url)
                 if (KK_setting_show_copyPN) { 
                     popupNotifications.copyPN(pan_obj)
@@ -796,6 +805,9 @@
                                     <option>后台打开</option>
                                 </select>
                             </label>
+                            <label class="KK-panai-setting-label">选中链接后是否自动复制
+                                <input type="checkbox" id="KK-checkbox-auto-copy" class="KK-panai-setting-checkbox" ${util.getValue('KK_setting_auto_copy') ? 'checked' : ''} >   
+                            </label>
                         </div>`;
             Swal.fire({
                 title: '快开助手配置',
@@ -803,7 +815,7 @@
                 icon: 'info',
                 showCloseButton: true,
                 confirmButtonText: '保存',
-                footer: '<div style="text-align: center;font-size: 1em;">点击查看 <a href="https://github.com/maimierjiafude/KK_OpenPanHelper" target="_blank">Github</a>，Powered by 龙龙龙</a></div>',
+                footer: '<div style="text-align: center;font-size: 1em;">点击查看 <a href="https://greasyfork.org/zh-CN/scripts/460184" target="_blank"> GreasyFork</a><a href="https://github.com/maimierjiafude/KK_OpenPanHelper" target="_blank"> Github</a><a href="https://www.acfun.cn/v/ac40763378" target="_blank"> 视频演示</a>，Powered by 龙龙龙</a></div>',
                 customClass
             }).then((res) => {
                 // history.go(0)刷新
@@ -825,6 +837,10 @@
 
             document.getElementById("KK-checkbox-show-copyPN").addEventListener('change', () => {
                 util.setValue('KK_setting_show_copyPN', !util.getValue('KK_setting_show_copyPN'));
+            });
+
+            document.getElementById("KK-checkbox-auto-copy").addEventListener('change', () => {
+                util.setValue('KK_setting_auto_copy', !util.getValue('KK_setting_auto_copy'));
             });
         },
 
@@ -851,7 +867,7 @@
                 .KK-panai-popup { font-size: 14px !important; text-align: center !important; }
                 .KK-panai-htmlContainer{ margin: 2px !important; padding:1px !important;}
                 .KK-panai-actions {justify-content: center!important; align-items: center;}
-                .KK-panai-setting-label { display: flex;align-items: center;justify-content: space-between;padding-top: 20px; }
+                .KK-panai-setting-label { display: flex;align-items: center;justify-content: space-between;padding-top: 15px; }
                 .KK-panai-setting-select { width: 150px;height: 30px;font-size: 1em; }
                 .KK-panai-setting-checkbox { width: 16px;height: 16px; }
             `;
