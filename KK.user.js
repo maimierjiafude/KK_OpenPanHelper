@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name              网盘快开助手
 // @namespace         https://github.com/maimierjiafude/KK_OpenPanHelper
-// @version           1.1.2
+// @version           1.1.3
 // @author            龙龙龙
 // @description       划一划，快速打开文本中的网盘链接，支持20+网盘，能自动提取提取码和解压密码。同时为了防止忘记链接相关信息，还会整合提取码和解压密码在链接里面，更有解压密码提示助手，在浏览器的历史记录里面打开，就会跳出提醒框，一键复制解压密码！！！。以及有分享的KK链接，要说的都在链接里面，插件全帮你搞定，直接网址打开无需多言（对方也要装网盘快开插件才行）。还有前后台打开模式，快开和弹窗模式，设置最适合自己的。沉浸式上网冲浪！
 // @license           AGPL-3.0-or-later
@@ -19,6 +19,9 @@
 // @grant             GM_info
 // @icon              data:image/svg+xml;base64,PHN2ZyB0PSIxNjczOTcwMjM5NTk1IiBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjE0MTMiIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIj48cGF0aCBkPSJNNDcwLjIyOTMzMyA0NDkuMTA5MzMzbDY0IDAuMTA2NjY3TDUzMy4zMzMzMzMgOTQ5LjM5NzMzM2wtNjQtMC4xMjggMC44OTYtNTAwLjE2eiBtMzIuMjEzMzM0LTM4OC4yNjY2NjZsMTkwLjE4NjY2NiAxOTUuMDA4djE1Ni40OGwxOTUuNTYyNjY3IDE5NS41NjI2NjZWNzQ4LjhoLTE5NS45NDY2Njd2OTAuOTg2NjY3aC02NHYtMTE4Ljc0MTMzNGgwLjM4NFYyODEuODc3MzMzbC0xMjYuMTg2NjY2LTEyOS4zODY2NjYtMTI2LjE2NTMzNCAxMjkuMzY1MzMzIDAuOTE3MzM0IDQ2Ni4xMzMzMzNoLTAuMjk4NjY3djkxLjc5NzMzNGgtNjR2LTkxLjc5NzMzNEgxMTcuMzMzMzMzdi0xNDAuMDk2bDE5NS4yLTE5NS4yMjEzMzMtMC4yOTg2NjYtMTU2LjggMTkwLjIwOC0xOTUuMDI5MzMzeiBtMTkwLjE4NjY2NiA0NDIuMDA1MzMzVjY4NC44aDEzMS41NjI2Njd2LTUwLjM4OTMzM2wtMTMxLjU2MjY2Ny0xMzEuNTYyNjY3eiBtLTM3OS45MjUzMzMgMC4xNzA2NjdMMTgxLjMzMzMzMyA2MzQuMzg5MzMzdjQ5LjZoMTMxLjczMzMzNGwtMC4zNjI2NjctMTgwLjk3MDY2NnoiIGZpbGw9IiMxNjc3RkYiIHAtaWQ9IjE0MTQiPjwvcGF0aD48L3N2Zz4=
 // ==/UserScript==
+
+
+
 
 
 
@@ -536,6 +539,9 @@
             }, {
                 name: 'KK_setting_auto_copy',
                 value: true
+            },{
+                name: 'KK_setting_selection_active',
+                value: false
             }];
             
             value.forEach((v) => {
@@ -631,13 +637,19 @@
 
             util.clog('获取到链接了!')
             util.clog(pan_obj)
-            parse.lastText = 'long';
-            (event == 'selection' ) ? window.getSelection().empty():'';
+            
+            // (event == 'selection' ) ? window.getSelection().empty():'';
 
             let KK_setting_open_model = util.getValue('KK_setting_open_model');
             let KK_setting_show_copyPN = util.getValue('KK_setting_show_copyPN');
             let KK_setting_auto_copy = util.getValue('KK_setting_auto_copy');
             let url = this.kkLink(pan_obj);
+            let KK_setting_selection_active = util.getValue('KK_setting_selection_active');
+
+            if (event == 'selection' && !KK_setting_selection_active){
+                window.getSelection().empty()
+                parse.lastText = 'long';
+            }
 
             if (KK_setting_auto_copy){
                 GM_setClipboard(url);
@@ -808,6 +820,9 @@
                             <label class="KK-panai-setting-label">选中链接后是否自动复制
                                 <input type="checkbox" id="KK-checkbox-auto-copy" class="KK-panai-setting-checkbox" ${util.getValue('KK_setting_auto_copy') ? 'checked' : ''} >   
                             </label>
+                            <label class="KK-panai-setting-label">选中链接后不自动取消选中
+                                <input type="checkbox" id="KK-setting-selection-active" class="KK-panai-setting-checkbox" ${util.getValue('KK_setting_selection_active') ? 'checked' : ''} >   
+                            </label>
                         </div>`;
             Swal.fire({
                 title: '快开助手配置',
@@ -842,6 +857,11 @@
             document.getElementById("KK-checkbox-auto-copy").addEventListener('change', () => {
                 util.setValue('KK_setting_auto_copy', !util.getValue('KK_setting_auto_copy'));
             });
+
+            document.getElementById("KK-setting-selection-active").addEventListener('change', () => {
+                util.setValue('KK_setting_selection_active', !util.getValue('KK_setting_selection_active'));
+            });
+
         },
 
         // 菜单注册
