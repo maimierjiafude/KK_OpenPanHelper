@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name              网盘快开助手
 // @namespace         https://github.com/maimierjiafude/KK_OpenPanHelper
-// @version           1.1.4
+// @version           1.1.5
 // @author            龙龙龙
 // @description       划一划，快速打开文本中的网盘链接，支持20+网盘，能自动提取提取码和解压密码。同时为了防止忘记链接相关信息，还会整合提取码和解压密码在链接里面，更有解压密码提示助手，在浏览器的历史记录里面打开，就会跳出提醒框，一键复制解压密码！！！。以及有分享的KK链接，要说的都在链接里面，插件全帮你搞定，直接网址打开无需多言（对方也要装网盘快开插件才行）。还有前后台打开模式，快开和弹窗模式，设置最适合自己的。沉浸式上网冲浪！
 // @license           AGPL-3.0-or-later
@@ -20,8 +20,6 @@
 // @icon              data:image/svg+xml;base64,PHN2ZyB0PSIxNjczOTcwMjM5NTk1IiBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjE0MTMiIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIj48cGF0aCBkPSJNNDcwLjIyOTMzMyA0NDkuMTA5MzMzbDY0IDAuMTA2NjY3TDUzMy4zMzMzMzMgOTQ5LjM5NzMzM2wtNjQtMC4xMjggMC44OTYtNTAwLjE2eiBtMzIuMjEzMzM0LTM4OC4yNjY2NjZsMTkwLjE4NjY2NiAxOTUuMDA4djE1Ni40OGwxOTUuNTYyNjY3IDE5NS41NjI2NjZWNzQ4LjhoLTE5NS45NDY2Njd2OTAuOTg2NjY3aC02NHYtMTE4Ljc0MTMzNGgwLjM4NFYyODEuODc3MzMzbC0xMjYuMTg2NjY2LTEyOS4zODY2NjYtMTI2LjE2NTMzNCAxMjkuMzY1MzMzIDAuOTE3MzM0IDQ2Ni4xMzMzMzNoLTAuMjk4NjY3djkxLjc5NzMzNGgtNjR2LTkxLjc5NzMzNEgxMTcuMzMzMzMzdi0xNDAuMDk2bDE5NS4yLTE5NS4yMjEzMzMtMC4yOTg2NjYtMTU2LjggMTkwLjIwOC0xOTUuMDI5MzMzeiBtMTkwLjE4NjY2NiA0NDIuMDA1MzMzVjY4NC44aDEzMS41NjI2Njd2LTUwLjM4OTMzM2wtMTMxLjU2MjY2Ny0xMzEuNTYyNjY3eiBtLTM3OS45MjUzMzMgMC4xNzA2NjdMMTgxLjMzMzMzMyA2MzQuMzg5MzMzdjQ5LjZoMTMxLjczMzMzNGwtMC4zNjI2NjctMTgwLjk3MDY2NnoiIGZpbGw9IiMxNjc3RkYiIHAtaWQ9IjE0MTQiPjwvcGF0aD48L3N2Zz4=
 // ==/UserScript==
 
-
-
 (function () {
     'use strict';
 
@@ -39,9 +37,9 @@
     let util = {
 
         // 控制台成组输出，便于查找到log
-        clog(c) {
+        clog(value, name = '打印：') {
             console.group("%c %c [网盘快开助手]", `background:url(${GM_info.script.icon}) center center no-repeat;background-size:12px;padding:3px`, "");
-            console.log(c);
+            console.log(name, value);
             console.groupEnd();
         },
 
@@ -153,16 +151,16 @@
             Swal.fire({
                 toast: true,
                 showCancelButton: true,
-                showConfirmButton:true,
+                showConfirmButton: true,
                 confirmButtonText: '复制KK链接',
                 cancelButtonText: '关闭',
                 position: 'top-start',
-                padding:'1px',
-                width:'300px',
-                title:`<span style="color: #2778c4;margin: 0px;font-weight:bold">解压密码：${zip} </span><button id="KK_zipButton" style="width:60px;height:25px;cursor: pointer;border:none;border-radius: 2px;background: red; text-align: center;color: white;positon:curser">复 制</button>`,
+                padding: '1px',
+                width: '300px',
+                title: `<span style="color: #2778c4;margin: 0px;font-weight:bold">解压密码：${zip} </span><button id="KK_zipButton" style="width:60px;height:25px;cursor: pointer;border:none;border-radius: 2px;background: red; text-align: center;color: white;positon:curser">复 制</button>`,
                 customClass
             }).then((res) => {
-                if (res.isConfirmed){
+                if (res.isConfirmed) {
                     GM_setClipboard(url);
                 }
             })
@@ -176,17 +174,17 @@
 
         },
 
-        contactPN(){
+        contactPN() {
             Swal.fire({
-                toast:false,
+                toast: false,
                 title: '💬 反馈 & 建议',
                 icon: 'success',
-                html:`
+                html: `
                     打开<a href="https://github.com/maimierjiafude/KK_OpenPanHelper" target="_blank">Github</a>发Issue<br>
                     打开<a href="https://github.com/maimierjiafude/KK_OpenPanHelper" target="_blank">Greasyfork</a>给我留言
                     `,
                 showCloseButton: false,
-                confirmButtonText:'好的',
+                confirmButtonText: '好的',
                 customClass
             })
         }
@@ -342,14 +340,14 @@
         // 解析selection
         parseSelection(text) {
             let pan_obj = this.parseEngine(text);
-            console.log(pan_obj);
 
             if (!pan_obj.link) {
                 let nameAndLinkObj = this.parseALink(window.getSelection());
-                if(nameAndLinkObj){
+                if (nameAndLinkObj) {
                     pan_obj.pan_name = nameAndLinkObj.pan_name;
                     pan_obj.link = nameAndLinkObj.link;
-                }     
+                    (pan_obj.pwd != nameAndLinkObj.pwd) ? pan_obj.pwd = nameAndLinkObj.pwd : ''
+                }
             };
 
             return pan_obj;
@@ -372,7 +370,7 @@
             };
 
             // 获取提取码
-            pan_obj.pwd = this.parsePwd(text);
+            let pwd = this.parsePwd(text);
 
             // 获取解压码
             pan_obj.zip = this.parseZipPasswords(text);
@@ -386,7 +384,9 @@
             let nameAndLinkObj = this.parseLink(text);
             pan_obj.pan_name = nameAndLinkObj.pan_name;
             pan_obj.link = nameAndLinkObj.link;
+            (pwd != nameAndLinkObj.pwd) ? pwd = nameAndLinkObj.pwd : ''
 
+            pan_obj.pwd = pwd
             return pan_obj;
 
         },
@@ -395,17 +395,17 @@
         // ⚠️可能会增加时间⚠️ 如果有需要可以增加选项
         // 获取选择内容的HTML和文本(增加兼容性) 或 DOM（节点遍历）
         // 使用chatGPT生成并修改
-        parseALink(selection) {           
+        parseALink(selection) {
             if (!selection.isCollapsed) {
                 const range = selection.getRangeAt(0);
                 const commonAncestor = range.commonAncestorContainer;
-                if (typeof(commonAncestor.querySelector) !== 'undefined') {
+                if (typeof (commonAncestor.querySelector) !== 'undefined') {
                     const links = commonAncestor.querySelector('*[href]')
                     return this.parseLink(links ? links.href : "");
                 }
 
             }
-            return ;
+            return;
         },
 
         // 选中文字的替换规则
@@ -443,16 +443,17 @@
             }
 
             let zip_hash_reg = /#zip(.+)zip/;
-            if (zip_hash_reg.test(text)){
+            if (zip_hash_reg.test(text)) {
                 let match = text.match(zip_hash_reg);
                 return match[1];
             }
 
             return '';
         },
+
         // 正则解析链接
         parseLink(text) {
-            let nameAndLinkObj = { pan_name: '', link: '' };
+            let nameAndLinkObj = { pan_name: '', link: '', pwd: '' };
 
             for (let pan_name in opt) {
                 let val = opt[pan_name];
@@ -460,6 +461,8 @@
                     let matches = text.match(val.reg);
                     nameAndLinkObj.pan_name = val.name;
                     nameAndLinkObj.link = matches[0];
+                    nameAndLinkObj.pwd = this.parsePwd(text)
+
                     if (val.replaceHost) {
                         nameAndLinkObj.link = nameAndLinkObj.link.replace(val.host, val.replaceHost);
                     }
@@ -472,22 +475,9 @@
         // 优化筛选输入的string，没有四个以上字母的通通抬走呢
         parsePreTextAndReturn(text) {
 
-            let text_reg = /[A-z]{4,}/g;
-
             if (text == this.lastText || text == '') {
                 return;
-            } else if (text.length > 200) {
-                return;
-            } 
-
-            // 获取提取码
-            let pwd = this.parsePwd(text);
-            // 获取解压码
-            let zip = this.parseZipPasswords(text);
-
-            if (pwd.length > 0 || zip.length > 0) {
-                
-            } else if (!text_reg.test(text)) {
+            } else if (text.length > 1000) {
                 return;
             }
 
@@ -506,9 +496,9 @@
         },
 
         // 专门为百度准备的解析，因为要本地存储比对
-        parseBaidLink(url) {
+        parseBaiduLink(url) {
             let baidu_reg = /(?:https?:\/\/)?(?:e?yun|pan)\.baidu\.com\/(?:s\/|share\/init\?surl=)(.+?)(?:\?|&)/;
-            if (baidu_reg.test(url)){
+            if (baidu_reg.test(url)) {
                 let match = url.match(baidu_reg);
                 return match[1];
             }
@@ -539,17 +529,17 @@
                 name: 'KK_local_data',
                 value: {
                     'url': '',
-                    'code': '', 
+                    'code': '',
                     'zip': ''
                 }
             }, {
                 name: 'KK_setting_auto_copy',
                 value: true
-            },{
+            }, {
                 name: 'KK_setting_selection_active',
                 value: true
             }];
-            
+
             value.forEach((v) => {
                 if (util.getValue(v.name) === undefined) {
                     util.setValue(v.name, v.value);
@@ -581,8 +571,11 @@
         },
 
         // 读取模式，并与之打开网页
-        openHTML(url){
+        openHTML(url) {
             let active = util.getValue('KK_setting_active');
+            if (url.indexOf('https') === -1) {
+                url = 'https://' + url;
+            }
             GM_openInTab(url, { active });
         },
 
@@ -600,7 +593,6 @@
                 util.setValue('tmp_quark_pwd', pwd);
             }
 
-            
             let url = link;
 
             if (pwd) {
@@ -609,9 +601,9 @@
                     extra = `${link}&pwd=${pwd}#${pwd}`;
                 }
                 url = extra;
-            } 
+            }
 
-            if (zip){
+            if (zip) {
                 url = `${url}#zip${encodeURI(zip)}zip`
             }
 
@@ -641,29 +633,29 @@
                 return
             };
 
-            util.clog('获取到链接了!')
             util.clog(pan_obj)
-            
+
             // (event == 'selection' ) ? window.getSelection().empty():'';
 
             let KK_setting_open_model = util.getValue('KK_setting_open_model');
             let KK_setting_show_copyPN = util.getValue('KK_setting_show_copyPN');
             let KK_setting_auto_copy = util.getValue('KK_setting_auto_copy');
-            let url = this.kkLink(pan_obj);
             let KK_setting_selection_active = util.getValue('KK_setting_selection_active');
 
-            if (event == 'selection' && KK_setting_selection_active){
+            let url = this.kkLink(pan_obj);
+
+            if (event == 'selection' && KK_setting_selection_active) {
                 window.getSelection().empty()
                 parse.lastText = 'long';
             }
 
-            if (KK_setting_auto_copy){
+            if (KK_setting_auto_copy) {
                 GM_setClipboard(url);
             };
 
             if (KK_setting_open_model) {
                 this.openHTML(url)
-                if (KK_setting_show_copyPN) { 
+                if (KK_setting_show_copyPN) {
                     popupNotifications.copyPN(pan_obj)
                 };
             } else {
@@ -697,21 +689,21 @@
         },
 
         // 本地存储百度的特征码和解压密码
-        saveBaiduData(baidu_save_code, zip){
-            if(baidu_save_code && zip){
+        saveBaiduData(baidu_save_code, zip) {
+            if (baidu_save_code && zip) {
                 util.setValue('KK_local_data', {
-                    'code':baidu_save_code, 
-                    'zip':zip
+                    'code': baidu_save_code,
+                    'zip': zip
                 });
             }
         },
 
         // 监听url的hash变化,并且进行当前url的替换，在hash值里面加入解压密码
-        watchUrlHashChange(zip){
-            if( ("onhashchange" in window) && ((typeof document.documentMode==="undefined") || document.documentMode==8)) {
+        watchUrlHashChange(zip) {
+            if (("onhashchange" in window) && ((typeof document.documentMode === "undefined") || document.documentMode == 8)) {
                 window.onhashchange = () => {
                     if (location.hash.toString().indexOf("#zip") == -1) {
-                        location.hash = '#zip' + zip + 'zip'+ location.hash
+                        location.hash = '#zip' + zip + 'zip' + location.hash
                     };
                 };
             }
@@ -720,22 +712,19 @@
         //自动填写密码
         autoFillPassword() {
             let panType = this.panDetectReturnName();
-            if (!panType){
-                return;
-            };
 
             let url = location.href;
             let pwd_query = parse.parseQuery('pwd');
             let pwd_hash = location.hash.slice(1);
-            
-            let baidu_save_code = parse.parseBaidLink(url)
+
+            let baidu_save_code = parse.parseBaiduLink(url)
 
             let zip = '';
             let zip_hash_reg = /#zip(.+)zip/;
-            if (zip_hash_reg.test(pwd_hash)){
+            if (zip_hash_reg.test(pwd_hash)) {
                 zip = pwd_hash.match(zip_hash_reg)[1];
                 zip = decodeURI(zip);
-                pwd_hash = pwd_hash.replace((pwd_hash.match(zip_hash_reg)[0]),'');
+                pwd_hash = pwd_hash.replace((pwd_hash.match(zip_hash_reg)[0]), '');
             }
 
             let pwd = pwd_query || pwd_hash;
@@ -756,19 +745,22 @@
                     }
                 }
             }
-            this.saveBaiduData(baidu_save_code, zip)
+
+            baidu_save_code && this.saveBaiduData(baidu_save_code, zip)
+
             let baidu_data = util.getValue('KK_local_data');
-            if ((url.indexOf(baidu_data.code) != -1 ) && !zip){
+
+            if ((url.indexOf(baidu_data.code) != -1) && !zip) {
                 zip = baidu_data.zip;
-                location.hash = '#zip' + zip + 'zip'+ location.hash
+                location.hash = '#zip' + zip + 'zip' + location.hash
                 url = location.href;
             };
 
-            if (zip && baidu_save_code){
-                this.watchUrlHashChange(zip);  
+            if (zip && baidu_save_code) {
+                this.watchUrlHashChange(zip);
             };
 
-            zip && popupNotifications.zipPN(url,zip);
+            zip && popupNotifications.zipPN(url, zip);
 
         },
 
@@ -847,7 +839,7 @@
             document.getElementById('KK-Model').selectedIndex = (util.getValue('KK_setting_open_model') ? 0 : 1);
             document.getElementById('KK-Model').addEventListener('change', () => {
                 let KK_checkbox_show_copyPN = document.getElementById('KK-checkbox-show-copyPN');
-                KK_checkbox_show_copyPN.style.display = (!util.getValue('KK_setting_open_model')? 'flex' : 'none')
+                KK_checkbox_show_copyPN.style.display = (!util.getValue('KK_setting_open_model') ? 'flex' : 'none')
                 util.setValue('KK_setting_open_model', !util.getValue('KK_setting_open_model'));
             });
 
