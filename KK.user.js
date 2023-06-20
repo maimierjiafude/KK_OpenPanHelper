@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name              网盘快开助手
 // @namespace         https://github.com/maimierjiafude/KK_OpenPanHelper
-// @version           1.1.6
+// @version           1.1.7
 // @author            龙龙龙
 // @description       划一划，快速打开文本中的网盘链接，支持20+网盘，能自动提取提取码和解压密码。同时为了防止忘记链接相关信息，还会整合提取码和解压密码在链接里面，更有解压密码提示助手，在浏览器的历史记录里面打开，就会跳出提醒框，一键复制解压密码！！！。以及有分享的KK链接，要说的都在链接里面，插件全帮你搞定，直接网址打开无需多言（对方也要装网盘快开插件才行）。还有前后台打开模式，快开和弹窗模式，设置最适合自己的。沉浸式上网冲浪！
 // @license           AGPL-3.0-or-later
@@ -9,7 +9,7 @@
 // @match             *://*/*
 // @require           https://unpkg.com/sweetalert2@10.16.6/dist/sweetalert2.min.js
 // @resource          swalStyle https://unpkg.com/sweetalert2@10.16.6/dist/sweetalert2.min.css
-// @run-at            document-idle
+// @run-at            document-idle 
 // @grant             GM_openInTab
 // @grant             GM_setValue
 // @grant             GM_getValue
@@ -26,11 +26,11 @@
     // 在addPluginStyle里面配置style
     // 对于一些部件自定义调节css样式，可以防止和其他插件撞样式
     const customClass = {
-        container: 'KK-panai-container',
-        popup: 'KK-panai-popup',
-        htmlContainer: 'KK-panai-htmlContainer',
-        title: 'KK-panai-title',
-        actions: 'KK-panai-actions',
+        container: 'KK-PanHelper-container',
+        popup: 'KK-PanHelper-popup',
+        htmlContainer: 'KK-PanHelper-htmlContainer',
+        title: 'KK-PanHelper-title',
+        actions: 'KK-PanHelper-actions',
     };
 
     // 工具汇总
@@ -157,7 +157,7 @@
                 position: 'top-start',
                 padding: '1px',
                 width: '300px',
-                title: `<span style="color: #2778c4;margin: 0px;font-weight:bold">解压密码：${zip} </span><button id="KK_zipButton" style="width:60px;height:25px;cursor: pointer;border:none;border-radius: 2px;background: red; text-align: center;color: white;positon:curser">复 制</button>`,
+                title: `<span style="color: #2778c4;margin: 0px;font-weight:bold">解压密码：${zip} </span><button id="KK_zipButton" style="width:60px;height:25px;cursor: pointer;border:none;border-radius: 2px;background: red; text-align: center;color: white;">复 制</button>`,
                 customClass
             }).then((res) => {
                 if (res.isConfirmed) {
@@ -180,8 +180,8 @@
                 title: '💬 反馈 & 建议',
                 icon: 'success',
                 html: `
-                    打开<a href="https://github.com/maimierjiafude/KK_OpenPanHelper" target="_blank">Github</a>发Issue<br>
-                    打开<a href="https://github.com/maimierjiafude/KK_OpenPanHelper" target="_blank">Greasyfork</a>给我留言
+                    打开<a style="color:blue;margin-right:5px;margin-left:5px;text-decoration: underline;font-weight: bold" href="https://github.com/maimierjiafude/KK_OpenPanHelper" target="_blank">Github</a>发Issue<br>
+                    打开<a style="color:blue;margin-right:5px;margin-left:5px;text-decoration: underline;font-weight: bold" href="https://github.com/maimierjiafude/KK_OpenPanHelper" target="_blank">GreasyFork</a>给我留言
                     `,
                 showCloseButton: false,
                 confirmButtonText: '好的',
@@ -561,9 +561,9 @@
 
             // 粘贴事件选择
             window.addEventListener("paste", (e) => {
-                let clipdata = e.clipboardData || window.clipboardData;
-                let cliptext = clipdata.getData("text/plain")
-                this.root('paste', cliptext);
+                let clipData = e.clipboardData || window.clipboardData;
+                let clipText = clipData.getData("text/plain")
+                this.root('paste', clipText);
             });
 
             // 快捷按键操作
@@ -669,11 +669,11 @@
         // 快捷键操作，Enter确定，Esc退出
         pressKey(event) {
             if (event.key === 'Enter') {
-                let confirmBtn = document.querySelector('.KK-panai-container .swal2-confirm');
+                let confirmBtn = document.querySelector('.KK-PanHelper-container .swal2-confirm');
                 confirmBtn && confirmBtn.click();
             }
             if (event.key === 'Escape') {
-                let cancelBtn = document.querySelector('.KK-panai-container .swal2-cancel');
+                let cancelBtn = document.querySelector('.KK-PanHelper-container .swal2-cancel');
                 cancelBtn && cancelBtn.click();
             }
         },
@@ -692,6 +692,7 @@
 
         // 本地存储百度的特征码和解压密码
         saveBaiduData(baidu_save_code, zip) {
+            console.log(123);
             if (baidu_save_code && zip) {
                 util.setValue('KK_local_data', {
                     'code': baidu_save_code,
@@ -802,26 +803,26 @@
         // 显示设置
         showSettingBox() {
             let html = `<div style="font-size: 1em;">
-                            <label class="KK-panai-setting-label">插件运行模式
-                                <select id="KK-Model" class="KK-panai-setting-select">
+                            <label class="KK-PanHelper-setting-label">插件运行模式
+                                <select id="KK-Model" class="KK-PanHelper-setting-select">
                                     <option>快开模式</option>
                                     <option>弹窗模式</option>
                                 </select>
                             </label>
-                            <label class="KK-panai-setting-label" id="KK-checkbox-show-copyPN" style="${util.getValue('KK_setting_open_model') ? 'display: flex' : 'display: none'}">快开模式显示复制弹窗
-                                <input type="checkbox" class="KK-panai-setting-checkbox" ${util.getValue('KK_setting_show_copyPN') ? 'checked' : ''} >
+                            <label class="KK-PanHelper-setting-label" id="KK-checkbox-show-copyPN" style="${util.getValue('KK_setting_open_model') ? 'display: flex' : 'display: none'}">快开模式显示复制弹窗
+                                <input type="checkbox" class="KK-PanHelper-setting-checkbox" ${util.getValue('KK_setting_show_copyPN') ? 'checked' : ''} >
                             </label>
-                            <label class="KK-panai-setting-label">新窗口打开方式
-                                <select id="KK-Active" class="KK-panai-setting-select">
+                            <label class="KK-PanHelper-setting-label">新窗口打开方式
+                                <select id="KK-Active" class="KK-PanHelper-setting-select">
                                     <option>新窗口打开</option>
                                     <option>后台打开</option>
                                 </select>
                             </label>
-                            <label class="KK-panai-setting-label">选中链接后->自动复制
-                                <input type="checkbox" id="KK-checkbox-auto-copy" class="KK-panai-setting-checkbox" ${util.getValue('KK_setting_auto_copy') ? 'checked' : ''} >   
+                            <label class="KK-PanHelper-setting-label">选中链接后->自动复制
+                                <input type="checkbox" id="KK-checkbox-auto-copy" class="KK-PanHelper-setting-checkbox" ${util.getValue('KK_setting_auto_copy') ? 'checked' : ''} >   
                             </label>
-                            <label class="KK-panai-setting-label">选中链接后->取消选中状态
-                                <input type="checkbox" id="KK-setting-selection-active" class="KK-panai-setting-checkbox" ${util.getValue('KK_setting_selection_active') ? 'checked' : ''} >   
+                            <label class="KK-PanHelper-setting-label">选中链接后->取消选中状态
+                                <input type="checkbox" id="KK-setting-selection-active" class="KK-PanHelper-setting-checkbox" ${util.getValue('KK_setting_selection_active') ? 'checked' : ''} >   
                             </label>
                         </div>`;
             Swal.fire({
@@ -830,7 +831,7 @@
                 icon: 'info',
                 showCloseButton: true,
                 confirmButtonText: '保存',
-                footer: '<div style="text-align: center;font-size: 1em;">点击查看 <a href="https://greasyfork.org/zh-CN/scripts/460184" target="_blank"> GreasyFork</a><a href="https://github.com/maimierjiafude/KK_OpenPanHelper" target="_blank"> Github</a><a href="https://www.acfun.cn/v/ac40763378" target="_blank"> 视频演示</a>，Powered by 龙龙龙</a></div>',
+                footer: '<div style="text-align: center;font-size: 1em;">点击查看 <a style="color:blue;margin-right:5px;text-decoration: underline;" href="https://greasyfork.org/zh-CN/scripts/460184" target="_blank"> GreasyFork</a><a style="color:blue;margin-right:5px;text-decoration: underline;" href="https://github.com/maimierjiafude/KK_OpenPanHelper" target="_blank"> Github</a><a style="color:blue;margin-right:5px;text-decoration: underline;" href="https://www.acfun.cn/v/ac40763378" target="_blank"> 视频演示</a>,Powered by 龙龙龙</div>',
                 customClass
             }).then((res) => {
                 // history.go(0)刷新
@@ -882,24 +883,24 @@
         // 样式总控制
         addPluginStyle() {
             let style = `
-                .KK-panai-title {text-align: center !important; }
-                .KK-panai-container { z-index: 99999!important; text-align: center !important; }
-                .KK-panai-popup { font-size: 14px !important; text-align: center !important; }
-                .KK-panai-htmlContainer{ margin: 2px !important; padding:1px !important;}
-                .KK-panai-actions {justify-content: center!important; align-items: center;}
-                .KK-panai-setting-label { display: flex;align-items: center;justify-content: space-between;padding-top: 15px; }
-                .KK-panai-setting-select { width: 150px;height: 30px;font-size: 1em; }
-                .KK-panai-setting-checkbox { width: 16px;height: 16px; }
+                .KK-PanHelper-title {text-align: center !important; }
+                .KK-PanHelper-container { z-index: 99999!important; text-align: center !important; }
+                .KK-PanHelper-popup { font-size: 14px !important; text-align: center !important; }
+                .KK-PanHelper-htmlContainer{ margin: 2px !important; padding:1px !important;}
+                .KK-PanHelper-actions {justify-content: center!important; align-items: center;}
+                .KK-PanHelper-setting-label { display: flex;align-items: center;justify-content: space-between;padding-top: 15px; }
+                .KK-PanHelper-setting-select { width: 150px;height: 30px;font-size: 1em; }
+                .KK-PanHelper-setting-checkbox { width: 16px;height: 16px; }
             `;
 
             if (document.head) {
                 util.addStyle('KK-swal-style', 'style', GM_getResourceText('swalStyle'));
-                util.addStyle('KK-panai-style', 'style', style);
+                util.addStyle('KK-PanHelper-style', 'style', style);
             }
 
             const headObserver = new MutationObserver(() => {
                 util.addStyle('KK-swal-style', 'style', GM_getResourceText('swalStyle'));
-                util.addStyle('KK-panai-style', 'style', style);
+                util.addStyle('KK-PanHelper-style', 'style', style);
             });
             headObserver.observe(document.head, { childList: true, subtree: true });
         },
