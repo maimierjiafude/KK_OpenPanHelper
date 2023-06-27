@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name              网盘快开助手
 // @namespace         https://github.com/maimierjiafude/KK_OpenPanHelper
-// @version           1.1.7
+// @version           1.1.8
 // @author            龙龙龙
 // @description       划一划，快速打开文本中的网盘链接，支持20+网盘，能自动提取提取码和解压密码。同时为了防止忘记链接相关信息，还会整合提取码和解压密码在链接里面，更有解压密码提示助手，在浏览器的历史记录里面打开，就会跳出提醒框，一键复制解压密码！！！。以及有分享的KK链接，要说的都在链接里面，插件全帮你搞定，直接网址打开无需多言（对方也要装网盘快开插件才行）。还有前后台打开模式，快开和弹窗模式，设置最适合自己的。沉浸式上网冲浪！
 // @license           AGPL-3.0-or-later
@@ -346,7 +346,9 @@
                 if (nameAndLinkObj) {
                     pan_obj.pan_name = nameAndLinkObj.pan_name;
                     pan_obj.link = nameAndLinkObj.link;
-                    (pan_obj.pwd != nameAndLinkObj.pwd) ? pan_obj.pwd = nameAndLinkObj.pwd : ''
+                    if (nameAndLinkObj.pwd != '') {
+                        (pan_obj.pwd != nameAndLinkObj.pwd) ? pan_obj.pwd = nameAndLinkObj.pwd : ''
+                    }
                 }
             };
 
@@ -433,6 +435,7 @@
                 let match = text.match(reg);
                 return match[0];
             }
+
             return '';
         },
 
@@ -753,11 +756,14 @@
 
             let baidu_data = util.getValue('KK_local_data');
 
-            if ((url.indexOf(baidu_data.code) != -1) && !zip) {
-                zip = baidu_data.zip;
-                location.hash = '#zip' + zip + 'zip' + location.hash
-                url = location.href;
-            };
+            if (baidu_data.code && url.indexOf('baidu') != -1) {
+                if ((url.indexOf(baidu_data.code) != -1) && !zip) {
+                    zip = baidu_data.zip;
+                    location.hash = '#zip' + zip + 'zip' + location.hash
+                    url = location.href;
+                };
+            }
+
 
             if (zip && baidu_save_code) {
                 this.watchUrlHashChange(zip);
